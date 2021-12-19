@@ -10,7 +10,7 @@ async function init() {
   try {
     const order_data = await api.getOrderList();
     order_arr = order_data.orders;
-    console.log(order_arr);
+    // console.log(order_arr);
     renderOrder(order_arr);
   } catch (e) {}
 }
@@ -77,11 +77,13 @@ function renderOrder(data) {
     allHtml += orderTpl(e);
   });
   orderList.innerHTML = allListTpl(allHtml);
+  renderChart()
 }
 
 //訂單功能
 async function orderAction(event) {
   event.preventDefault();
+  if(!event.target.getAttribute("data-action")) return false;
   switch (event.target.getAttribute("data-action")) {
     case "delete": {
       try {
@@ -129,21 +131,35 @@ async function deleteAll(){
 orderList.addEventListener("click", orderAction);
 discardAllBtn.addEventListener("click", deleteAll);
 
-let chart = c3.generate({
-  bindto: "#chart", // HTML 元素綁定
-  data: {
-    type: "pie",
-    columns: [
-      ["Louvre 雙人床架", 1],
-      ["Antony 雙人床架", 2],
-      ["Anty 雙人床架", 3],
-      ["其他", 4],
-    ],
-    colors: {
-      "Louvre 雙人床架": "#DACBFF",
-      "Antony 雙人床架": "#9D7FEA",
-      "Anty 雙人床架": "#5434A7",
-      其他: "#301E5F",
+
+function renderChart(){
+  console.log(order_arr)
+  let totalObj = {};
+  order_arr.forEach( el => {
+    el.products.forEach( el => {
+      if(!totalObj[el.title]){
+        totalObj[el.title] = 1;
+      }else{
+        totalObj[el.title] += el.quantity;
+      }
+    })
+  })
+  Object.entries(totalObj)
+  c3.generate({
+    bindto: "#chart", // HTML 元素綁定
+    data: {
+      type: "pie",
+      columns:Object.entries(totalObj),
+      colors: {
+        "Louvre 單人床架": "#D3E4CD",
+        "Charles 系列儲物組合": "#99A799",
+        "Charles 雙人床架": "#F2DDC1",
+        "Louvre 雙人床架／雙人加大": "#E2C2B9",
+        "Jordan 雙人床架／雙人加大": "#B8E4F0",
+        "Antony 雙人床架／雙人加大": "#98BAE7",
+        "Antony 遮光窗簾": "#FFAFAF",
+        "Antony 床邊桌": "#00A19D",
+      },
     },
-  },
-});
+  });
+}

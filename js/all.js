@@ -51,6 +51,7 @@ let product_arr = [];
 let cart_arr = [];
 init();
 
+
 async function init() {
   try {
     const product_data = await api.getProducts();
@@ -70,8 +71,7 @@ const productCardTpl = (item) => {
     <h4 class="productType">新品</h4>
     <img src="${item.images}" alt="">
     <a href="#" class="addCardBtn" data-id="${item.id}" data-title="${
-    item.title
-  }">加入購物車</a>
+    item.title}" data-action="add">加入購物車</a>
     <h3>${item.title}</h3>
     <del class="originPrice">NT$${item.origin_price.toLocaleString(
       "en-US"
@@ -166,8 +166,9 @@ function searchProducts(event) {
 
 //加入購物車
 async function addToCart(event) {
+  event.preventDefault();
+  if(!event.target.getAttribute("data-action")) return false;
   try {
-    event.preventDefault();
     const data = {
       productId: event.target.getAttribute("data-id"),
       quantity: 1,
@@ -182,6 +183,7 @@ async function addToCart(event) {
 //購物車功能(編輯數量/刪除)
 async function CartAction(event) {
   event.preventDefault();
+  if(!event.target.getAttribute("data-action")) return false;
   switch (event.target.getAttribute("data-action")) {
     case "deleteItem": {
       try {
